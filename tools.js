@@ -5,7 +5,12 @@ const fs = require('fs');
 const extract = require('extract-zip');
 const rimraf = require('rimraf');
 const path = require('path');
-
+const getBrachURL = (zip_url, branch) =>{
+  const splits = zip_url.split("/")
+  const version = splits[splits.length-1]
+  return zip_url.replace(version,branch)
+  // return 
+}
 module.exports = {
   download_resource: (resource, dataConfigFile, save, specifiedfolder) => {
     const arraytosplit = resource.split("/");
@@ -33,14 +38,12 @@ module.exports = {
             if (!(data)) {
               console.log(chalk.red("Error: Version for "+ resource_user + "/" + resource_name + " not found !"));
               console.log("\n");
-              reject("Error: Resource "+ resource_user + "/" + resource_name + " Not Found for this version !");
-              return;
+              data = res.body[0];
+
             }        
           }
-          console.log(chalk.green('Installing ' + resource_name + ' - ' + resource_version));
-          const zip_url = data.zipball_url;
-          console.log(zip_url);
-
+          console.log(chalk.green('Installing ' + resource_name + ' - ' + resource_version));      
+          let zip_url = getBrachURL(data.zipball_url,resource_version);
           await request
             .get(zip_url)
             .set('User-Agent', 'fvm-installer')
